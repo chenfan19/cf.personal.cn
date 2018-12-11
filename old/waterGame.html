@@ -1,349 +1,349 @@
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>通水游戏</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>通水游戏</title>
 </head>
 <body>
 </body>
 <script>
-	
+
 var app = {};
 
 //app基础设置
 app.setting = {
-	'zoneSize': 60,
-	'zoneBackgroundColor': '#CCCCCC',
-	'pipeWidth': 10,
-	'pipeBorderWidth': 1,
-	'mapRow': 8,
-	'mapColumn': 8,
-	'mapBackgroundColor': '#EEEEEE',
-	'waterColor': '#CCFFFF',
-	'successZoneBackgroundColor': '#0000FF',
-	'failedZoneBackgroundColor': '#FF0000',
-	'mouseOverOpacity': 0.3,
-	'previewAmount': 4,
+    'zoneSize': 60,
+    'zoneBackgroundColor': '#CCCCCC',
+    'pipeWidth': 10,
+    'pipeBorderWidth': 1,
+    'mapRow': 8,
+    'mapColumn': 8,
+    'mapBackgroundColor': '#EEEEEE',
+    'waterColor': '#CCFFFF',
+    'successZoneBackgroundColor': '#0000FF',
+    'failedZoneBackgroundColor': '#FF0000',
+    'mouseOverOpacity': 0.3,
+    'previewAmount': 4,
 };
 
 //管道对象构造器
 app.constructor.Pipe = function(location){
-	//初始化管道属性
-	this.element = document.createElement("div");
-	this.location = location;
-	//管道相对区域绝对定位
-	this.element.style.position = 'absolute';
-	//管道的直径为设定的宽度
-	this.element.style.height = app.setting.pipeWidth;
-	//一截管道的长度计算
-	this.element.style.width = (app.setting.zoneSize + app.setting.pipeWidth) / 2;
-	//管道的位置偏移
-	this.element.style.top = (app.setting.zoneSize - app.setting.pipeWidth) / 2 - app.setting.pipeBorderWidth;
-	this.element.style.left = (app.setting.zoneSize - app.setting.pipeWidth) / 2 - app.setting.pipeBorderWidth;
-	//设置边框
-	this.element.style.border = app.setting.pipeBorderWidth+'px solid black';
-	this.element.style.borderRight = 'none';
-	//设置旋转中心和旋转角度
-	var transformOrigin = app.setting.pipeWidth / 2 + app.setting.pipeBorderWidth;
-	this.element.style.transformOrigin =  transformOrigin + 'px ' + transformOrigin + 'px';
-	this.element.style.transform = 'rotate(' + this.location*90 + 'deg)';
+    //初始化管道属性
+    this.element = document.createElement("div");
+    this.location = location;
+    //管道相对区域绝对定位
+    this.element.style.position = 'absolute';
+    //管道的直径为设定的宽度
+    this.element.style.height = app.setting.pipeWidth;
+    //一截管道的长度计算
+    this.element.style.width = (app.setting.zoneSize + app.setting.pipeWidth) / 2;
+    //管道的位置偏移
+    this.element.style.top = (app.setting.zoneSize - app.setting.pipeWidth) / 2 - app.setting.pipeBorderWidth;
+    this.element.style.left = (app.setting.zoneSize - app.setting.pipeWidth) / 2 - app.setting.pipeBorderWidth;
+    //设置边框
+    this.element.style.border = app.setting.pipeBorderWidth+'px solid black';
+    this.element.style.borderRight = 'none';
+    //设置旋转中心和旋转角度
+    var transformOrigin = app.setting.pipeWidth / 2 + app.setting.pipeBorderWidth;
+    this.element.style.transformOrigin =  transformOrigin + 'px ' + transformOrigin + 'px';
+    this.element.style.transform = 'rotate(' + this.location*90 + 'deg)';
 }
 
 //区域对象构造器
 app.constructor.Zone = function(){
-	//初始化区域属性
-	this.element = document.createElement("div");
-	this.pipes = [null, null, null, null];
-	//设置区域样式
-	this.element.style.position = 'relative';
-	this.element.style.float = 'left';
-	this.element.style.width = app.setting.zoneSize;
-	this.element.style.height = app.setting.zoneSize;
-	this.element.style.backgroundColor = app.setting.zoneBackgroundColor;
+    //初始化区域属性
+    this.element = document.createElement("div");
+    this.pipes = [null, null, null, null];
+    //设置区域样式
+    this.element.style.position = 'relative';
+    this.element.style.float = 'left';
+    this.element.style.width = app.setting.zoneSize;
+    this.element.style.height = app.setting.zoneSize;
+    this.element.style.backgroundColor = app.setting.zoneBackgroundColor;
 }
 
 app.constructor.Zone.prototype.createPipes = function(pipes){
-	//为区域生成管道
-	do{
-		pipeAmount = 0;
-		for(var i=0; i<4; i++){
-			if((pipes&&pipes[i]) || (!pipes&&Math.random()>0.5)){
-				var pipe = new app.constructor.Pipe(i);
-				this.pipes[i] = pipe;
-				this.element.appendChild(pipe.element);
-				pipeAmount++;
-			}
-		}
-	}while(pipeAmount < 2)
-	//将每个管道克隆后去除边框，提高zindex，覆盖处理掉不同管道的边框交叉线
-	var pipes = this.pipes;
-	var pipesLength = pipes.length;
-	for(var i=0; i<pipesLength; i++){
-		if(!(pipes[i] instanceof app.constructor.Pipe)) {
-			continue;
-		}
-		var cPipe = pipes[i].element.cloneNode(true);
-		cPipe.style.zIndex = 1;
-		cPipe.style.border = 'none';
-		cPipe.style.top = (app.setting.zoneSize - app.setting.pipeWidth) / 2;
-		cPipe.style.left = (app.setting.zoneSize - app.setting.pipeWidth) / 2;
-		cPipe.style.transformOrigin = (app.setting.pipeWidth / 2) + 'px ' + (app.setting.pipeWidth / 2) + 'px';
-		cPipe.style.backgroundColor = app.setting.zoneBackgroundColor;
-		this.element.appendChild(cPipe);
-	}
-	return this;
+    //为区域生成管道
+    do{
+        pipeAmount = 0;
+        for(var i=0; i<4; i++){
+            if((pipes&&pipes[i]) || (!pipes&&Math.random()>0.5)){
+                var pipe = new app.constructor.Pipe(i);
+                this.pipes[i] = pipe;
+                this.element.appendChild(pipe.element);
+                pipeAmount++;
+            }
+        }
+    }while(pipeAmount < 2)
+    //将每个管道克隆后去除边框，提高zindex，覆盖处理掉不同管道的边框交叉线
+    var pipes = this.pipes;
+    var pipesLength = pipes.length;
+    for(var i=0; i<pipesLength; i++){
+        if(!(pipes[i] instanceof app.constructor.Pipe)) {
+            continue;
+        }
+        var cPipe = pipes[i].element.cloneNode(true);
+        cPipe.style.zIndex = 1;
+        cPipe.style.border = 'none';
+        cPipe.style.top = (app.setting.zoneSize - app.setting.pipeWidth) / 2;
+        cPipe.style.left = (app.setting.zoneSize - app.setting.pipeWidth) / 2;
+        cPipe.style.transformOrigin = (app.setting.pipeWidth / 2) + 'px ' + (app.setting.pipeWidth / 2) + 'px';
+        cPipe.style.backgroundColor = app.setting.zoneBackgroundColor;
+        this.element.appendChild(cPipe);
+    }
+    return this;
 };
 
 //区域位置滑入事件
 app.zoneLocationMouseOver = function(e){
-	var e = e ? e : window.event;
-	if(this.contains(e.fromElement)){
-		return;
-	}
-	var zoneLocation = this.zoneLocation;
-	var row = zoneLocation.row;
-	var column = zoneLocation.column;
-	if(zoneLocation.zone != null){
-		return ;
-	}
-	//复制预览区域内容并显示在当前区域位置
-	var cNode = app.preview.zones[0].element.cloneNode(true);
-	cNode.style.opacity = app.setting.mouseOverOpacity;
-	this.appendChild(cNode);
+    var e = e ? e : window.event;
+    if(this.contains(e.fromElement)){
+        return;
+    }
+    var zoneLocation = this.zoneLocation;
+    var row = zoneLocation.row;
+    var column = zoneLocation.column;
+    if(zoneLocation.zone != null){
+        return ;
+    }
+    //复制预览区域内容并显示在当前区域位置
+    var cNode = app.preview.zones[0].element.cloneNode(true);
+    cNode.style.opacity = app.setting.mouseOverOpacity;
+    this.appendChild(cNode);
 };
 
 //区域位置滑出事件
 app.zoneLocationMouseOut = function(e){
-	var e = e ? e : window.event;
-	if(this.contains(e.toElement)){
-		return;
-	}
-	var zoneLocation = this.zoneLocation;
-	var row = zoneLocation.row;
-	var column = zoneLocation.column;
-	if(zoneLocation.zone != null){
-		return ;
-	}
-	//清除当前区域位置预览内容
-	this.removeChild(this.childNodes[0]);
+    var e = e ? e : window.event;
+    if(this.contains(e.toElement)){
+        return;
+    }
+    var zoneLocation = this.zoneLocation;
+    var row = zoneLocation.row;
+    var column = zoneLocation.column;
+    if(zoneLocation.zone != null){
+        return ;
+    }
+    //清除当前区域位置预览内容
+    this.removeChild(this.childNodes[0]);
 };
 
 //区域位置点击事件
 app.zoneLocationClick = function(){
-	var zoneLocation = this.zoneLocation;
-	var row = zoneLocation.row;
-	var column = zoneLocation.column;
-	if(zoneLocation.zone != null){
-		return ;
-	}
-	//清除当前区域位置预览内容
-	this.removeChild(this.childNodes[0]);
-	//将预览区域填充至点击区域，更新预览
-	zoneLocation.zone = app.preview.zones[0];
-	this.appendChild(zoneLocation.zone.element);
-	app.preview.previewUpdate();
-	//以此区域开始进行通水
-	zoneLocation.spread();
-	//重新计分
-	app.scorer.updateScore();
-	//判断游戏是否结束
-	app.isEnd();
+    var zoneLocation = this.zoneLocation;
+    var row = zoneLocation.row;
+    var column = zoneLocation.column;
+    if(zoneLocation.zone != null){
+        return ;
+    }
+    //清除当前区域位置预览内容
+    this.removeChild(this.childNodes[0]);
+    //将预览区域填充至点击区域，更新预览
+    zoneLocation.zone = app.preview.zones[0];
+    this.appendChild(zoneLocation.zone.element);
+    app.preview.previewUpdate();
+    //以此区域开始进行通水
+    zoneLocation.spread();
+    //重新计分
+    app.scorer.updateScore();
+    //判断游戏是否结束
+    app.isEnd();
 };
 
 //区域位置对象构造器
 app.constructor.ZoneLocation = function(row, column){
-	//初始化区域属性
-	this.element = document.createElement("div");
-	this.row = row;
-	this.column = column;
-	this.isWatered = false;
-	this.zone = null;
-	this.element.zoneLocation = this;
-	//设置区域样式
-	this.element.style.position = 'relative';
-	this.element.style.float = 'left';
-	this.element.style.width = app.setting.zoneSize;
-	this.element.style.height = app.setting.zoneSize;
-	//设置事件
-	this.element.onmouseover = app.zoneLocationMouseOver;
-	this.element.onmouseout = app.zoneLocationMouseOut;
-	this.element.onclick = app.zoneLocationClick;
+    //初始化区域属性
+    this.element = document.createElement("div");
+    this.row = row;
+    this.column = column;
+    this.isWatered = false;
+    this.zone = null;
+    this.element.zoneLocation = this;
+    //设置区域样式
+    this.element.style.position = 'relative';
+    this.element.style.float = 'left';
+    this.element.style.width = app.setting.zoneSize;
+    this.element.style.height = app.setting.zoneSize;
+    //设置事件
+    this.element.onmouseover = app.zoneLocationMouseOver;
+    this.element.onmouseout = app.zoneLocationMouseOut;
+    this.element.onclick = app.zoneLocationClick;
 };
 
 //区域位置通水
 app.constructor.ZoneLocation.prototype.water = function(){
-	var pipeElements = this.zone.element.childNodes;
-	for(var i=0; i<pipeElements.length; i++){
-		pipeElements[i].style.backgroundColor = app.setting.waterColor;
-	}
-	this.isWatered = true;
+    var pipeElements = this.zone.element.childNodes;
+    for(var i=0; i<pipeElements.length; i++){
+        pipeElements[i].style.backgroundColor = app.setting.waterColor;
+    }
+    this.isWatered = true;
 };
 
 //以此区域位置开始向其他区域通水
 app.constructor.ZoneLocation.prototype.spread = function(){
-	var row = this.row;
-	var column = this.column;
-	//判断此区域是否通水
-	var aroundZoneLocations = {}; //四周的区域位置对象
-	aroundZoneLocations.top = (app.map.zones[row-1] && app.map.zones[row-1][column]);
-	aroundZoneLocations.left = (app.map.zones[row] && app.map.zones[row][column-1]);
-	aroundZoneLocations.right = (app.map.zones[row] && app.map.zones[row][column+1]);
-	aroundZoneLocations.bottom = (app.map.zones[row+1] && app.map.zones[row+1][column]);
-	for (i in aroundZoneLocations){
-		var thatZone = aroundZoneLocations[i];
-		if(thatZone && thatZone.isWatered){
-			//和四周有水的区域判断互相管道方向是否联通，联通则此区域通水
-			if((i == 'top' && this.zone.pipes[3] && thatZone.zone && thatZone.zone.pipes[1]) ||
-				(i == 'left' && this.zone.pipes[2] && thatZone.zone && thatZone.zone.pipes[0]) ||
-				(i == 'right' && this.zone.pipes[0] && thatZone.zone && thatZone.zone.pipes[2]) ||
-				(i == 'bottom' && this.zone.pipes[1] && thatZone.zone && thatZone.zone.pipes[3])){
-				this.water();
-				for (i in aroundZoneLocations){
-					//周围未通水区域开始通水
-					if(aroundZoneLocations[i] && aroundZoneLocations[i].zone && !aroundZoneLocations[i].isWatered){
-						aroundZoneLocations[i].spread();
-					}
-				}
-				break;
-			}
-		}
-	}
+    var row = this.row;
+    var column = this.column;
+    //判断此区域是否通水
+    var aroundZoneLocations = {}; //四周的区域位置对象
+    aroundZoneLocations.top = (app.map.zones[row-1] && app.map.zones[row-1][column]);
+    aroundZoneLocations.left = (app.map.zones[row] && app.map.zones[row][column-1]);
+    aroundZoneLocations.right = (app.map.zones[row] && app.map.zones[row][column+1]);
+    aroundZoneLocations.bottom = (app.map.zones[row+1] && app.map.zones[row+1][column]);
+    for (i in aroundZoneLocations){
+        var thatZone = aroundZoneLocations[i];
+        if(thatZone && thatZone.isWatered){
+            //和四周有水的区域判断互相管道方向是否联通，联通则此区域通水
+            if((i == 'top' && this.zone.pipes[3] && thatZone.zone && thatZone.zone.pipes[1]) ||
+                (i == 'left' && this.zone.pipes[2] && thatZone.zone && thatZone.zone.pipes[0]) ||
+                (i == 'right' && this.zone.pipes[0] && thatZone.zone && thatZone.zone.pipes[2]) ||
+                (i == 'bottom' && this.zone.pipes[1] && thatZone.zone && thatZone.zone.pipes[3])){
+                this.water();
+                for (i in aroundZoneLocations){
+                    //周围未通水区域开始通水
+                    if(aroundZoneLocations[i] && aroundZoneLocations[i].zone && !aroundZoneLocations[i].isWatered){
+                        aroundZoneLocations[i].spread();
+                    }
+                }
+                break;
+            }
+        }
+    }
 };
 
 //单例模式生成地图对象
 app.map = new function(){
-	//地图属性初始化
-	this.element = document.createElement('div');
-	this.zones = [];
-	//地图样式生成
-	this.element.style.width = app.setting.mapColumn * app.setting.zoneSize;
-	this.element.style.height = app.setting.mapRow * app.setting.zoneSize;
-	this.element.style.backgroundColor = app.setting.mapBackgroundColor;
-	//填充区域位置对象
-	for(var i=0; i<app.setting.mapRow; i++){
-		this.zones[i] = [];
-		for(var j=0; j<app.setting.mapColumn; j++){
-			var zoneLocation = new app.constructor.ZoneLocation(i, j);
-			this.zones[i][j] = zoneLocation;
-			this.element.appendChild(zoneLocation.element);
-		}
-	}
+    //地图属性初始化
+    this.element = document.createElement('div');
+    this.zones = [];
+    //地图样式生成
+    this.element.style.width = app.setting.mapColumn * app.setting.zoneSize;
+    this.element.style.height = app.setting.mapRow * app.setting.zoneSize;
+    this.element.style.backgroundColor = app.setting.mapBackgroundColor;
+    //填充区域位置对象
+    for(var i=0; i<app.setting.mapRow; i++){
+        this.zones[i] = [];
+        for(var j=0; j<app.setting.mapColumn; j++){
+            var zoneLocation = new app.constructor.ZoneLocation(i, j);
+            this.zones[i][j] = zoneLocation;
+            this.element.appendChild(zoneLocation.element);
+        }
+    }
 }();
 
 //单例模式生成计分器对象
 app.scorer = new function(){
-	//计分器属性初始化
-	this.element = document.createElement('div');
-	this.score = 0;
-	//计分器样式生成
-	this.element.style.width = app.setting.zoneSize;
-	this.element.style.fontSize = 10;
-	this.element.style.color = '#FF0000';
-	this.element.style.marginBottom = 20;
-	//更新分数
-	this.updateScore = function(){
-		var score = 0;
-		var zones = app.map.zones;
-		for(var i=0; i<zones.length; i++){
-			for (var j=0; j<zones[i].length; j++) {
-				if(zones[i][j].isWatered){
-					score++;
-				}
-			}
-		}
-		this.score = score;
-		this.element.textContent = '目前得分:'+this.score;
-	};
+    //计分器属性初始化
+    this.element = document.createElement('div');
+    this.score = 0;
+    //计分器样式生成
+    this.element.style.width = app.setting.zoneSize;
+    this.element.style.fontSize = 10;
+    this.element.style.color = '#FF0000';
+    this.element.style.marginBottom = 20;
+    //更新分数
+    this.updateScore = function(){
+        var score = 0;
+        var zones = app.map.zones;
+        for(var i=0; i<zones.length; i++){
+            for (var j=0; j<zones[i].length; j++) {
+                if(zones[i][j].isWatered){
+                    score++;
+                }
+            }
+        }
+        this.score = score;
+        this.element.textContent = '目前得分:'+this.score;
+    };
 }();
 
 //单例模式生成预览区域对象
 app.preview = new function(){
-	//初始化预览区域属性
-	this.element = document.createElement('div');
-	this.zones = [];
+    //初始化预览区域属性
+    this.element = document.createElement('div');
+    this.zones = [];
 
-	//构造预览区域布局
-	this.element.style.width = app.setting.zoneSize;
-	var previewDiv = document.createElement('div');
-	previewDiv.style.width = app.setting.zoneSize;
-	previewDiv.style.height = app.setting.zoneSize;
-	previewDiv.style.marginTop = 0.2 * app.setting.zoneSize;
-	previewDiv.style.marginBottom = 0.3 * app.setting.zoneSize;
-	previewDiv.style.border = app.setting.zoneSize/30 + "px outset " + app.setting.zoneBackgroundColor;
-	this.element.appendChild(previewDiv);
-	this.zones.push(null);
-	for(var i=1; i<app.setting.previewAmount; i++){
-		this.zones.push(null);
-		var previewDiv = document.createElement('div');
-		previewDiv.style.width = app.setting.zoneSize;
-		previewDiv.style.height = app.setting.zoneSize;
-		previewDiv.style.marginLeft = 0.5 * app.setting.zoneSize;
-		previewDiv.style.marginBottom = 0.1 * app.setting.zoneSize;
-		previewDiv.style.border = app.setting.zoneSize/40 + "px outset " + app.setting.zoneBackgroundColor;
-		this.element.appendChild(previewDiv);
-	}
+    //构造预览区域布局
+    this.element.style.width = app.setting.zoneSize;
+    var previewDiv = document.createElement('div');
+    previewDiv.style.width = app.setting.zoneSize;
+    previewDiv.style.height = app.setting.zoneSize;
+    previewDiv.style.marginTop = 0.2 * app.setting.zoneSize;
+    previewDiv.style.marginBottom = 0.3 * app.setting.zoneSize;
+    previewDiv.style.border = app.setting.zoneSize/30 + "px outset " + app.setting.zoneBackgroundColor;
+    this.element.appendChild(previewDiv);
+    this.zones.push(null);
+    for(var i=1; i<app.setting.previewAmount; i++){
+        this.zones.push(null);
+        var previewDiv = document.createElement('div');
+        previewDiv.style.width = app.setting.zoneSize;
+        previewDiv.style.height = app.setting.zoneSize;
+        previewDiv.style.marginLeft = 0.5 * app.setting.zoneSize;
+        previewDiv.style.marginBottom = 0.1 * app.setting.zoneSize;
+        previewDiv.style.border = app.setting.zoneSize/40 + "px outset " + app.setting.zoneBackgroundColor;
+        this.element.appendChild(previewDiv);
+    }
 
-	//生成新预览方法
-	this.previewUpdate = function(){
-		do {
-			isZoneNull = false;
-			for(var i=0; i<app.setting.previewAmount; i++){
-				if(this.zones[i+1] === null){
-					isZoneNull = true;
-					continue;
-				}
-				var newZone = this.zones[i+1] ? this.zones[i+1] : new app.constructor.Zone().createPipes();
-				this.element.childNodes[i].appendChild(newZone.element);
-				this.zones[i] = newZone;
-			}
-		} while(isZoneNull);
-	}
-	this.previewUpdate();
+    //生成新预览方法
+    this.previewUpdate = function(){
+        do {
+            isZoneNull = false;
+            for(var i=0; i<app.setting.previewAmount; i++){
+                if(this.zones[i+1] === null){
+                    isZoneNull = true;
+                    continue;
+                }
+                var newZone = this.zones[i+1] ? this.zones[i+1] : new app.constructor.Zone().createPipes();
+                this.element.childNodes[i].appendChild(newZone.element);
+                this.zones[i] = newZone;
+            }
+        } while(isZoneNull);
+    }
+    this.previewUpdate();
 }();
 
 //app布局生成
 app.start = function(){
-	//生成app最外层div
-	var appDiv = document.createElement('div');
-	appDiv.style.width = app.setting.mapColumn * app.setting.zoneSize + 1.5 * app.setting.zoneSize;
-	appDiv.style.height = app.setting.mapRow * app.setting.zoneSize;
-	//组装地图div
-	app.map.element.style.float = 'left';
-	appDiv.appendChild(app.map.element);
-	//组装计分器div
-	app.scorer.element.style.float= 'right';
-	appDiv.appendChild(app.scorer.element);
-	//组装预览区div
-	app.preview.element.style.float = 'right';
-	appDiv.appendChild(app.preview.element);
-	//加载界面
-	document.body.appendChild(appDiv);
-	//生成初始通水区域
-	var firstZone = new app.constructor.Zone().createPipes([true, true, false, false]);
-	app.map.zones[0][0].zone = firstZone;
-	app.map.zones[0][0].element.appendChild(firstZone.element);
-	app.map.zones[0][0].water();
-	//计分
-	app.scorer.updateScore();
+    //生成app最外层div
+    var appDiv = document.createElement('div');
+    appDiv.style.width = app.setting.mapColumn * app.setting.zoneSize + 1.5 * app.setting.zoneSize;
+    appDiv.style.height = app.setting.mapRow * app.setting.zoneSize;
+    //组装地图div
+    app.map.element.style.float = 'left';
+    appDiv.appendChild(app.map.element);
+    //组装计分器div
+    app.scorer.element.style.float= 'right';
+    appDiv.appendChild(app.scorer.element);
+    //组装预览区div
+    app.preview.element.style.float = 'right';
+    appDiv.appendChild(app.preview.element);
+    //加载界面
+    document.body.appendChild(appDiv);
+    //生成初始通水区域
+    var firstZone = new app.constructor.Zone().createPipes([true, true, false, false]);
+    app.map.zones[0][0].zone = firstZone;
+    app.map.zones[0][0].element.appendChild(firstZone.element);
+    app.map.zones[0][0].water();
+    //计分
+    app.scorer.updateScore();
 }
 
 //app结束
 app.isEnd = function(){
-	var zones = app.map.zones;
-	for(var i=0; i<zones.length; i++){
-		for (var j=0; j<zones[i].length; j++) {
-			if(zones[i][j].zone == null){
-				return ;
-			}
-		}
-	}
-	for(var i=0; i<zones.length; i++){
-		for (var j=0; j<zones[i].length; j++) {
-			if(zones[i][j].isWatered){
-				zones[i][j].zone.element.style.backgroundColor = app.setting.successZoneBackgroundColor;
-			}
-		}
-	}
-	alert('游戏结束，有'+app.scorer.score+'个区域成功通水');
+    var zones = app.map.zones;
+    for(var i=0; i<zones.length; i++){
+        for (var j=0; j<zones[i].length; j++) {
+            if(zones[i][j].zone == null){
+                return ;
+            }
+        }
+    }
+    for(var i=0; i<zones.length; i++){
+        for (var j=0; j<zones[i].length; j++) {
+            if(zones[i][j].isWatered){
+                zones[i][j].zone.element.style.backgroundColor = app.setting.successZoneBackgroundColor;
+            }
+        }
+    }
+    alert('游戏结束，有'+app.scorer.score+'个区域成功通水');
 }
 
 app.start();
