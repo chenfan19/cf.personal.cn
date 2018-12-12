@@ -1,0 +1,33 @@
+<html>
+<head>
+    <title>closure</title>
+</head>
+<body>
+    <div style="background-color:red;width:200px;height:200px;float:left"></div>
+    <div style="background-color:yellow;width:200px;height:200px;float:left"></div>
+    <div style="background-color:green;width:200px;height:200px;float:left"></div>
+    <div style="background-color:black;width:200px;height:200px;float:left"></div>
+    <div style="background-color:blue;width:200px;height:200px;float:left"></div>
+    <div style="background-color:orange;width:200px;height:200px;float:left"></div>
+</body>
+<script>
+    var add_the_handlers = function(nodes){
+        for(var i=0; i<nodes.length; i++){
+            nodes[i].onclick = function(){
+                alert(i);
+            }
+        }
+    }
+    var add_the_handlers = function(nodes){
+        var helper = function(i){
+            return function(){
+                alert(i);
+            };
+        }
+        for(var i=0; i<nodes.length; i++){
+            nodes[i].onclick = helper(i);
+        }
+    }
+    add_the_handlers(document.getElementsByTagName('div'));
+</script>
+</html>
