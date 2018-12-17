@@ -1,0 +1,23 @@
+<html>
+<head>
+    <title>trim</title>
+</head>
+<script>
+    String.prototype.newTrim = function(){
+        return this.replace(/^\s+|\s+$/g, '');
+    };
+    var a = "   d   ";
+    console.log(a);
+    a = a.newTrim();
+    console.log(a);
+
+    String.newTrim = function(string){
+        return string.replace(/^\s+|\s+$/g, '');
+    };
+    var b = "   d   ";
+    console.log(b);
+    b = String.newTrim(b);
+    console.log(b);
+</script>
+<body></body>
+</html>

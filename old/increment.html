@@ -1,0 +1,28 @@
+<html>
+<head>
+    <title>increment</title>
+</head>
+<script>
+    var obj = function(){
+        var value = 1;
+        return {
+            increment: function(num){
+                value += typeof num == 'number' ? num : 1;
+            },
+            getValue: function(){
+                return value;
+            }
+        };
+    }();
+    var a = obj.getValue();
+    obj.increment('100');
+    var b = obj.getValue();
+    obj.increment(100);
+    var c = obj.getValue();
+    console.log(a);
+    console.log(b);
+    console.log(c);
+</script>
+<body>
+</body>
+</html>

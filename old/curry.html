@@ -1,0 +1,19 @@
+<html>
+<head>
+    <title>curry</title>
+</head>
+<script>
+    function createAdd(addSum){
+        return function(amount){
+            return amount + addSum;
+        }
+    }
+    var add1 = createAdd(1);
+    var add2 = createAdd(2);
+    console.log(add1(2));
+    console.log(add2(4));
+</script>
+<body>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+<html>
+<head>
+    <title>inherit</title>
+</head>
+<script>
+    // var mammal = function(name){
+    //  this.name = name;
+    // }
+    // var cat = new mammal('cat');
+    // console.log(cat);
+    // if(typeof cat.cry == 'function'){
+    //  cat.cry();
+    // }
+    // mammal.prototype.cry = function(){
+    //  alert('meow');
+    // }
+    // console.log(cat);
+    // if(typeof cat.cry == 'function'){
+    //  cat.cry();
+    // }
+    // var mammal = function(name){
+    //  this.name = name;
+    // }
+    // var cat = function(name){
+    //  this.name = name;
+    //  this.saying = 'meow';
+    // }
+    // cat.prototype = new mammal();
+    // console.log(cat.prototype);
+    var mammal = {
+        'says': function(){
+            alert(this.saying);
+        },
+    };
+    var cat = Object.create(mammal);
+    cat.saying = 'meow';
+    cat.says();
+    console.log(cat);
+</script>
+<body>
+
+</body>
+</html>

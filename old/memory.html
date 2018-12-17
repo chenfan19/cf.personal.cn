@@ -1,0 +1,54 @@
+<html>
+<head>
+    <title>memory</title>
+</head>
+<script>
+    /* without memory */
+    // var fibonacci = function(i){
+    //  return i < 2 ? i : fibonacci(i-1) + fibonacci(i-2);
+    // }
+    // for(var i=0; i<40; i++){
+    //  console.log(fibonacci(i));
+    // }
+    /* with memory */
+    // var fibonacci = function(){
+    //  var memory = [0,1];
+    //  return function(i){
+    //      if(typeof memory[i] == 'number'){
+    //          return memory[i];
+    //      }
+    //      var ret = fibonacci(i-1) + fibonacci(i-2);
+    //      memory[i] = ret;
+    //      return ret;
+    //  }
+    // }();
+    // for(var i=0; i<100; i++){
+    //  console.log(fibonacci(i));
+    // }
+    /* memory function constructor */
+    var memoryFunctionConstructor = function(memory, handler){
+        var func = function(i){
+            if(typeof memory[i] != 'undefined'){
+                return memory[i];
+            }
+            var ret = handler(func, i);
+            memory[i] = ret;
+            return ret;
+        }
+        return func;
+    };
+    var fibonacci = memoryFunctionConstructor([0,1], function(func, i){
+        return func(i-1) + func(i-2);
+    });
+    var factorial = memoryFunctionConstructor([1,1], function(func, i){
+        return func(i-1) * i;
+    });
+    for(var i=0; i<100; i++){
+        console.log(fibonacci(i));
+    }
+    for(var i=0; i<100; i++){
+        console.log(factorial(i));
+    }
+</script>
+<body></body>
+</html>

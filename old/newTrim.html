@@ -1,0 +1,31 @@
+<html>
+<head>
+    <title>newTrim</title>
+</head>
+<script>
+    String.prototype.newTrim = function(){
+        var trimChar = ' ';
+        return function(newTrimChar){
+            if(typeof newTrimChar == 'string' && newTrimChar.length == 1){
+                if(trimChar.indexOf(newTrimChar) == -1){
+                    trimChar += newTrimChar;
+                }
+                return this;
+            }else{
+                return this.replace(RegExp("^["+trimChar+"]+|["+trimChar+"]+$", 'g'), '');
+            }
+        };
+    }();
+    var a = ' a b  s  b ';
+    console.log(a);
+    console.log(a.newTrim());
+    a.newTrim('a').newTrim('b');
+    console.log(a.newTrim());
+
+    var b = '  ab  ';
+    console.log(b.newTrim());
+</script>
+<body>
+
+</body>
+</html>

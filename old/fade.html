@@ -1,0 +1,25 @@
+<html>
+<head>
+    <title>fade</title>
+</head>
+<script>
+    window.onload = function(){
+        fade(document.body, '#FFFF');
+        fade(document.getElementById('colorChange'), '#0000');
+    };
+    function fade(obj, colorPre){
+        hex = 0;
+        var step = function(){
+            obj.style.backgroundColor = colorPre+hex.toString(16)+hex.toString(16);
+            hex++;
+            if(hex < 16){
+                setTimeout(step, 100);
+            }
+        }
+        setTimeout(step, 100);
+    };
+</script>
+<body>
+    <div id="colorChange" style="width:200px;height:200px;"></div>
+</body>
+</html>
